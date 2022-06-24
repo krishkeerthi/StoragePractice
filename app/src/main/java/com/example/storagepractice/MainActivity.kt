@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.storagepractice.databinding.ActivityMainBinding
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -51,13 +52,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadData(fileName: String): String{
         return try{
-            val ipStream = openFileInput(fileName)
-            var c: Int
-            var temp = ""
-            while (ipStream.read().also { c = it } != -1) {
-                temp += c.toChar()//.toString()
-            }
-            temp
+//            val ipStream = openFileInput(fileName)
+//            var c: Int
+//            var temp = ""
+//            while (ipStream.read().also { c = it } != -1) {
+//                temp += c.toChar()//.toString()
+//            }
+//            temp
+
+            //        or
+
+//            openFileInput(fileName).bufferedReader().useLines {
+//                it.fold("") { some, text ->
+//                    "$some \n$text"
+//                }
+//            }
+            //           or
+
+            File(filesDir,fileName).readText()
 
             // ip stream properties/methods
             //ipStream.channel
