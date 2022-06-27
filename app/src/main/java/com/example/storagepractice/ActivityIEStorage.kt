@@ -1,16 +1,26 @@
 package com.example.storagepractice
 
+import android.app.usage.StorageStatsManager
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.storage.StorageManager
+import android.os.storage.StorageManager.ACTION_CLEAR_APP_CACHE
+import android.os.storage.StorageManager.ACTION_MANAGE_STORAGE
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PackageManagerCompat.LOG_TAG
+import androidx.core.content.getSystemService
 import com.example.storagepractice.databinding.ActivityIestorageBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintWriter
+import java.util.*
 
 // File(filepath, filename)
 
@@ -26,7 +36,10 @@ import java.io.PrintWriter
 //     or other types of content when using Storage Access Framework.
 //     because a user is involved in the process of selecting the actual content to work with.
 class ActivityIEStorage : AppCompatActivity() {
+    val NUM_BYTES_NEEDED_FOR_MY_APP = 1024 * 1024 * 5000L
+
     private lateinit var binding: ActivityIestorageBinding
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityIestorageBinding.inflate(layoutInflater)
@@ -69,6 +82,22 @@ class ActivityIEStorage : AppCompatActivity() {
             //saveData("First shared file to other apps" , "SampleImage")
         }
 
+        // check available space
+        checkAvailableSpace()
+
+        // list of file in internal app specific storage
+        Log.d(TAG, "list of files: ${fileList()}")
+
+        // create new sub directory
+        getDir("sub directory", Context.MODE_PRIVATE)
+
+        // delete file
+        File(filesDir, "SampleImage").delete()
+
+        deleteFile("SampleFile1")  // file under internal files dir -- success
+        deleteFile("SampleCacheFile26024872273533928123.tmp") // file under internal cache dir
+        // file under cache not deleted
+        deleteFile("SampleCacheFile754745500754961458suffix") // not deleted
 
         Log.d(TAG, "onCreate: external file directory: ${getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)}")
         Log.d(TAG, "onCreate: external cache directory: $externalCacheDir")
@@ -100,6 +129,17 @@ class ActivityIEStorage : AppCompatActivity() {
         return Environment.MEDIA_MOUNTED == state
     }
 
+    private fun isExternalStorageWritable(): Boolean {
+        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    }
+
+    // Checks if a volume containing external storage is available to at least read.
+    private fun isExternalStorageReadable(): Boolean {
+        return Environment.getExternalStorageState() in
+                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+    }
+
+
     private fun createFile(fileName: String){
         //File(filesDir, fileName)
         //var file = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
@@ -122,7 +162,7 @@ class ActivityIEStorage : AppCompatActivity() {
 
         file = File(file, fileName)
         writeSharedFile( file, "External storage but within the" +
-                "app package")
+                "app package , app specific data")
         //saveData("Sample text", fileName)
     }
 
@@ -196,6 +236,34 @@ class ActivityIEStorage : AppCompatActivity() {
         }
         catch (e: Exception){
             Toast.makeText(this, "Exception: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun checkAvailableSpace(){
+        val storageManager = applicationContext.getSystemService<StorageManager>()!!
+        val appSpecificInternalDirUuid: UUID = storageManager.getUuidForPath(filesDir)
+        val availableBytes: Long =
+            storageManager.getAllocatableBytes(appSpecificInternalDirUuid)
+        Log.d(TAG, "checkAvailableSpace: requested bytes: ${NUM_BYTES_NEEDED_FOR_MY_APP/(1024*1024)} MB")
+        Log.d(TAG, "checkAvailableSpace: Available bytes: ${availableBytes/(1024*1024)} MB")
+
+
+
+        if (availableBytes >= NUM_BYTES_NEEDED_FOR_MY_APP) {
+//            storageManager.allocateBytes(
+//                appSpecificInternalDirUuid, NUM_BYTES_NEEDED_FOR_MY_APP)
+            Log.d(TAG, "checkAvailableSpace: space available")
+        } else {
+            Log.d(TAG, "checkAvailableSpace: space unavailable")
+            val storageIntent = Intent().apply {
+                // To request that the user remove all app cache files instead, set
+                // "action" to ACTION_CLEAR_APP_CACHE.
+                action = ACTION_MANAGE_STORAGE // it works
+                //action = ACTION_CLEAR_APP_CACHE // not going to cache page
+            }
+            startActivity(storageIntent)
         }
 
     }

@@ -2,9 +2,11 @@ package com.example.storagepractice
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.storagepractice.databinding.ActivityMainBinding
+import com.example.storagepractice.databinding.ActivityMediaStoreBinding
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -25,8 +27,8 @@ class MainActivity : AppCompatActivity() {
             binding.dataTextView.text = loadData("SampleFile")
         }
 
-        startActivity(Intent(this, ActivityIEStorage::class.java))
-
+//        startActivity(Intent(this, ActivityIEStorage::class.java))
+        startActivity(Intent(this, SAFActivity::class.java))
     }
 
     private fun saveData(data: String, fileName: String){
@@ -40,8 +42,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Saved to file successfully", Toast.LENGTH_SHORT).show()
 
             // op stream methods
-            opStream.channel
-            opStream.fd
+//            opStream.channel
+//            opStream.fd
 
         }
         catch (e: Exception){
