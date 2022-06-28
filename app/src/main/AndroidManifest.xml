@@ -16,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StoragePractice">
         <activity
+            android:name=".DatabaseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SharedPreferenceActivity"
+            android:exported="false" />
+        <activity
             android:name=".SAFActivity"
             android:exported="false" />
         <activity

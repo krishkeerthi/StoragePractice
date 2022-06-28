@@ -1,6 +1,5 @@
 package com.example.storagepractice
 
-import android.app.usage.StorageStatsManager
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -8,18 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.storage.StorageManager
-import android.os.storage.StorageManager.ACTION_CLEAR_APP_CACHE
 import android.os.storage.StorageManager.ACTION_MANAGE_STORAGE
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.PackageManagerCompat.LOG_TAG
 import androidx.core.content.getSystemService
 import com.example.storagepractice.databinding.ActivityIestorageBinding
 import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintWriter
 import java.util.*
 
 // File(filepath, filename)
@@ -39,8 +34,10 @@ class ActivityIEStorage : AppCompatActivity() {
     val NUM_BYTES_NEEDED_FOR_MY_APP = 1024 * 1024 * 5000L
 
     private lateinit var binding: ActivityIestorageBinding
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         binding = ActivityIestorageBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -59,27 +56,21 @@ class ActivityIEStorage : AppCompatActivity() {
             //File.createTempFile("SampleCacheFile2", null, cacheDir)
         }
 
+        binding.nextButton.setOnClickListener {
+            startActivity(Intent(this, MediaStoreActivity::class.java))
+        }
+
         binding.sharedFileButton.setOnClickListener {
             val file = getPublicDocumentStorageDir("SharedFile.txt")
             Log.d(TAG, "onCreate: file Path: $file")
-            if(file.exists()){
+            if (file.exists()) {
                 Log.d(TAG, "onCreate: file exists")
-            }
-            else{
+            } else {
                 Log.d(TAG, "onCreate: file does not exist")
 
-                writeSharedFile(file, "First shared file to other apps")
-                
-//                val opStream = FileOutputStream(file)
-//                val printWriter = PrintWriter(opStream)
-//                printWriter.write("First shared file to other apps")
-//                printWriter.flush()
-//                printWriter.close()
-//                opStream.close()
-                //file.writeBytes("First shared file to other apps".toByteArray())
-                //saveData("First shared file to other apps", file.absolutePath)
+                writeFile(file, "First shared file to other apps")
             }
-            //saveData("First shared file to other apps" , "SampleImage")
+
         }
 
         // check available space
@@ -99,7 +90,10 @@ class ActivityIEStorage : AppCompatActivity() {
         // file under cache not deleted
         deleteFile("SampleCacheFile754745500754961458suffix") // not deleted
 
-        Log.d(TAG, "onCreate: external file directory: ${getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)}")
+        Log.d(
+            TAG,
+            "onCreate: external file directory: ${getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)}"
+        )
         Log.d(TAG, "onCreate: external cache directory: $externalCacheDir")
         Log.d(TAG, "onCreate: external cache directories index  0: ${externalCacheDirs[0]}")
         // index 0 is primary external storage storage/emulated/0/Android/
@@ -109,22 +103,21 @@ class ActivityIEStorage : AppCompatActivity() {
         val granted = checkExternalStoragePermission()
         Log.d(TAG, "onCreate: External storage permission: $granted")
 
-        //getPublicAlbumStorageDir("SampleImage")
     }
 
-    private fun writeSharedFile(file: File, message: String) {
+    private fun writeFile(file: File, message: String) {
 //        val opStream = FileOutputStream(file)
 //        opStream.write(message.toByteArray())
 //        opStream.close()
 
- //                       or
+        //                       or
 
         file.writeText(message)
 
         Toast.makeText(this, "Shared file created", Toast.LENGTH_SHORT).show()
     }
 
-    private fun checkExternalStoragePermission(): Boolean{
+    private fun checkExternalStoragePermission(): Boolean {
         val state = Environment.getExternalStorageState()
         return Environment.MEDIA_MOUNTED == state
     }
@@ -140,7 +133,7 @@ class ActivityIEStorage : AppCompatActivity() {
     }
 
 
-    private fun createFile(fileName: String){
+    private fun createFile(fileName: String) {
         //File(filesDir, fileName)
         //var file = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
         var file = getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS)[1]
@@ -161,14 +154,16 @@ class ActivityIEStorage : AppCompatActivity() {
         // can write to these files.
 
         file = File(file, fileName)
-        writeSharedFile( file, "External storage but within the" +
-                "app package , app specific data")
+        writeFile(
+            file, "External storage but within the" +
+                    "app package , app specific data"
+        )
         //saveData("Sample text", fileName)
     }
 
-    private fun createTempFileInCache(fileName: String){
-        File.createTempFile(fileName, "suffix", cacheDir)
-        File.createTempFile("prefix","suffix")
+    private fun createTempFileInCache(fileName: String) {
+//        File.createTempFile(fileName, "suffix", cacheDir)
+//        File.createTempFile("prefix","suffix")
 
         // when directory not mentioned default directory is cache dir
         // creates temporary file name
@@ -177,7 +172,7 @@ class ActivityIEStorage : AppCompatActivity() {
 
         var file = externalCacheDir // by clearing cache, files stored in this directory is deleted
         file = File(file, "SampleCacheFile.txt")
-        writeSharedFile(file, "Cache text file created inside external cache directory")
+        writeFile(file, "Cache text file created inside external cache directory")
     }
 
     private fun getPublicDocumentStorageDir(albumName: String): File {
@@ -187,12 +182,13 @@ class ActivityIEStorage : AppCompatActivity() {
                 Environment.DIRECTORY_DOCUMENTS
             ), albumName
 
-        ///storage/emulated/0/Documents
+            ///storage/emulated/0/Documents
 
-        // Important: data saved here also saved in
-        // storage/self/primary/Documents
+            // Important: data saved here also saved in
+            // storage/self/primary/Documents
         )
     }
+
     private fun getPublicAlbumStorageDir(albumName: String?): File {
         // Get the directory for the user's public pictures directory.
         val file = File(
@@ -204,50 +200,21 @@ class ActivityIEStorage : AppCompatActivity() {
 //        if (!file.mkdirs()) {  // creates a directory under media/0/pictures/sampleImage(given album name)
 //            Log.d(TAG, "Directory not created")
 //        }
-        // file methods/properties
-//        file.isFile //this abstract pathname is a normal file. A file is normal if it is not a directory
-//        file.absoluteFile //Returns the absolute form of this abstract pathname. Equivalent to new File(this.getAbsolutePath).
-//        file.absolutePath //Returns the absolute path of this file. An absolute path is a path that starts at a root of the file system.
-//        // On Android, there is only one root: /.
-//        file.canonicalFile //Returns the canonical form of this abstract pathname. Equivalent to new File(this.getCanonicalPath).
-//        file.freeSpace //Returns the number of unallocated bytes in the partition named by this abstract path name.
-//        file.isAbsolute // true if this abstract pathname is absolute, false otherwise
-//        file.isDirectory //true if and only if the file denoted by this abstract pathname exists and is a directory; false otherwise
-//        file.isHidden//true if and only if the file denoted by this abstract pathname is hidden according to the conventions of the underlying platform
-//        file.name
-//        file.parent
-//        file.parentFile //The abstract pathname of the parent directory named by this abstract pathname
-//        file.totalSpace //Returns the size of the partition named by this abstract pathname.
-//        file.usableSpace // this method checks for write permissions and other operating system restrictions and will therefore usually provide a
-//        // more accurate estimate of how much new data can actually be written than getFreeSpace.
-//        file.path
 
         return file
     }
-    private fun saveData(data: String, fileName: String){
-        try{
-            val opStream = openFileOutput(fileName, MODE_APPEND)
-            //MODE_PRIVATE, MODE_WORLD_READABLE, MODE_WORLD_WRITEABLE, and MODE_APPEND
-
-            opStream.write(data.toByteArray())
-            opStream.close()
-
-            Toast.makeText(this, "Saved to file successfully", Toast.LENGTH_SHORT).show()
-        }
-        catch (e: Exception){
-            Toast.makeText(this, "Exception: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun checkAvailableSpace(){
+    private fun checkAvailableSpace() {
         val storageManager = applicationContext.getSystemService<StorageManager>()!!
         val appSpecificInternalDirUuid: UUID = storageManager.getUuidForPath(filesDir)
         val availableBytes: Long =
             storageManager.getAllocatableBytes(appSpecificInternalDirUuid)
-        Log.d(TAG, "checkAvailableSpace: requested bytes: ${NUM_BYTES_NEEDED_FOR_MY_APP/(1024*1024)} MB")
-        Log.d(TAG, "checkAvailableSpace: Available bytes: ${availableBytes/(1024*1024)} MB")
+        Log.d(
+            TAG,
+            "checkAvailableSpace: requested bytes: ${NUM_BYTES_NEEDED_FOR_MY_APP / (1024 * 1024)} MB"
+        )
+        Log.d(TAG, "checkAvailableSpace: Available bytes: ${availableBytes / (1024 * 1024)} MB")
 
 
 
@@ -267,4 +234,69 @@ class ActivityIEStorage : AppCompatActivity() {
         }
 
     }
+
+    // path, absolute path, canonical path
+
+    //C:\temp\file.txt - This is a path, an absolute path, and a canonical path.
+    //
+    //.\file.txt - This is a path. It's neither an absolute path nor a canonical path.
+    //
+    //C:\temp\myapp\bin\..\\..\file.txt - This is a path and an absolute path. It's not a canonical path.
+    //
+    //A canonical path is always an absolute path.
+    //
+    //Converting from a path to a canonical path makes it absolute (usually tack on the current working directory so
+    // e.g. ./file.txt becomes c:/temp/file.txt). The canonical path of a file just "purifies" the path, removing and resolving
+    // stuff like ..\ and resolving symlinks (on unixes).
+
+    private fun fileMethods() {
+        // file methods/properties
+//        file.isFile //this abstract pathname is a normal file. A file is normal if it is not a directory
+//        file.absoluteFile //Returns the absolute form of this abstract pathname. Equivalent to new File(this.getAbsolutePath).
+//        file.absolutePath //Returns the absolute path of this file. An absolute path is a path that starts at a root of the file system.
+//        // On Android, there is only one root: /.
+//        file.canonicalFile //Returns the canonical form of this abstract pathname. Equivalent to new File(this.getCanonicalPath).
+//        file.freeSpace //Returns the number of unallocated bytes in the partition named by this abstract path name.
+//        file.isAbsolute // true if this abstract pathname is absolute, false otherwise
+//        file.isDirectory //true if and only if the file denoted by this abstract pathname exists and is a directory; false otherwise
+//        file.isHidden//true if and only if the file denoted by this abstract pathname is hidden according to the conventions of the underlying platform
+//        file.name
+//        file.parent
+//        file.parentFile //The abstract pathname of the parent directory named by this abstract pathname
+//        file.totalSpace //Returns the size of the partition named by this abstract pathname.
+//        file.usableSpace // this method checks for write permissions and other operating system restrictions and will therefore usually provide a
+//        // more accurate estimate of how much new data can actually be written than getFreeSpace.
+//        file.path
+        // file.createTempFile()
+        // file.canRead()
+        //mkdir
+        //length
+        //delete
+    }
+
+    private fun streamRelated() {
+        //                val opStream = FileOutputStream(file)
+//                val printWriter = PrintWriter(opStream)
+//                printWriter.write("First shared file to other apps")
+//                printWriter.flush()
+//                printWriter.close()
+//                opStream.close()
+//file.writeBytes("First shared file to other apps".toByteArray())
+//saveData("First shared file to other apps", file.absolutePath)
+
+// opstream, printwriter
+// ipstream, bufferreader
+    }
+
+    private fun environmentFunctions(){
+//        Environment.getExternalStorageDirectory()
+//        Environment.getExternalStorageState()
+//        Environment.getExternalStoragePublicDirectory()
+//        Environment.getDataDirectory()  // /data directory
+//        Environment.getRootDirectory()  // /root directory
+//        Environment.getStorageDirectory()  // Return root directory where all external storage devices will be mounted
+//        Environment.getDownloadCacheDirectory()  // download/cache content directory.
+    }
 }
+
+

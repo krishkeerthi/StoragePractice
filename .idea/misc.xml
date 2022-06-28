@@ -3,11 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_database.xml" value="0.2807971014492754" />
         <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_iestorage.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_main.xml" value="0.22826086956521738" />
         <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_manage_space.xml" value="0.1203125" />
         <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_media_store.xml" value="0.22291666666666668" />
         <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_safactivity.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/keerthi-con927/AndroidStudioProjects/StoragePractice/app/src/main/res/layout/activity_shared_preference.xml" value="0.1461499493414387" />
       </map>
     </option>
   </component>

@@ -19,7 +19,20 @@ import com.example.storagepractice.databinding.ActivityMediaStoreBinding
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+//Android 10 (API level 29) and higher, these media files are stored in the MediaStore.
 
+//Content resolver
+//Accessing a provider. When you want to access data in a content provider, you use the ContentResolver
+// object in your application's Context to communicate with the provider as a client.
+// The ContentResolver object communicates with the provider object, an instance of a class that implements ContentProvider
+
+// A file output stream is an output stream for writing data to a File or to a FileDescriptor
+// FileOutputStream is meant for writing streams of raw bytes such as image data.
+// For writing streams of characters, consider using FileWriter.
+
+// A FileInputStream obtains input bytes from a file in a file system.
+//FileInputStream is meant for reading streams of raw bytes such as image data.
+// For reading streams of characters, consider using FileReader.
 class MediaStoreActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMediaStoreBinding
 
@@ -30,7 +43,6 @@ class MediaStoreActivity : AppCompatActivity() {
         binding = ActivityMediaStoreBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         binding.cameraButton.setOnClickListener {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             cameraLauncher.launch(intent)
@@ -40,6 +52,10 @@ class MediaStoreActivity : AppCompatActivity() {
             //storeBitmapToExternalFilesDir(bitmap)
             //storeBitmapToExternalPublicDir(bitmap)
             storeUsingMediaStore(bitmap)
+        }
+
+        binding.nextButton.setOnClickListener {
+            startActivity(Intent(this, SAFActivity::class.java))
         }
 
         val uris = queryMediaStore()
@@ -76,6 +92,11 @@ class MediaStoreActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Images.Media.getContentUri(
                     MediaStore.VOLUME_EXTERNAL
+                //The VOLUME_EXTERNAL volume provides a view of all shared storage volumes on the device.
+                    // You can read the contents of this synthetic volume, but you cannot modify the contents.
+                    // The VOLUME_EXTERNAL_PRIMARY volume represents the primary shared storage volume on the device.
+                    // You can read and modify the contents of this volume.
+
                 )
             } else {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -151,6 +172,7 @@ class MediaStoreActivity : AppCompatActivity() {
         put(MediaStore.MediaColumns.DISPLAY_NAME , "camimgmediastore2.png")
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
         // by default it is stored in external/pictures
+
         //put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DCIM)
         // image stored in dcim is shown in gallery app
         // whereas image stored in pictures is not shown in gallery
@@ -214,5 +236,20 @@ class MediaStoreActivity : AppCompatActivity() {
         }
     }
 
+    private fun mediaStore(){
+        //MediaStore.Images. // media
+        //MediaStore.Audio. // album, artist, genre, media, radio
+        //MediaStore.Video. // media
+        //MediaStore.Files.
+        //MediaStore.Downloads.
+    }
+
+    private fun bitmap(){
+//        Bitmap.CompressFormat.PNG // the PNG format. PNG is lossless, so quality is ignored.
+//        Bitmap.CompressFormat.JPEG //quality of 0 means compress for the smallest size. 100 means compress for max visual quality.
+//        Bitmap.CompressFormat.WEBP_LOSSLESS // WEBP lossless format.
+//        Bitmap.CompressFormat.WEBP_LOSSY //compress to the WEBP lossy format. quality of 0 means compress for the smallest size.
+    // 100 means compress for max visual quality
+    }
 
 }
